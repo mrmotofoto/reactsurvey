@@ -1,11 +1,22 @@
 import React, { Component } from 'react';
 import './App.css';
+var uuid = require('uuid');
+var firebase = require('firebase');
+
+var config = {
+    apiKey: "AIzaSyDVrtZl-t35LqE61PvEDw5vLW_2ad_2XFA",
+    authDomain: "rjs-reactsurvey.firebaseapp.com",
+    databaseURL: "https://rjs-reactsurvey.firebaseio.com",
+    storageBucket: "rjs-reactsurvey.appspot.com",
+    messagingSenderId: "310556041643"
+  };
+  firebase.initializeApp(config);
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id:'',
+      id:uuid.v1(),
       name: '',
       answers: {
         q1:'',
@@ -28,6 +39,13 @@ class App extends Component {
 
   handleQuestionSubmit(event) {
     event.preventDefault();
+    firebase.database().ref('surveys/' + this.state.id).set({
+      name:this.state.name,
+      answers:this.state.answers
+    });
+    this.setState({submitted:true}, function(){
+      console.log('Questions Submitted....');
+    });
   }
 
   handleQuestionChange(event){
@@ -86,6 +104,7 @@ class App extends Component {
             <input type="radio" name="q4" value="Shrimp" onChange={this.handleQuestionChange} />Shrimp <br />
             <input type="radio" name="q4" value="Other" onChange={this.handleQuestionChange} />Other <br />
           </div>
+          <input type="submit" name="submit" value="submit" />
         </form>
       </span>
     } else if(!this.state.name && this.state.submitted === false) {
@@ -97,7 +116,7 @@ class App extends Component {
       </span>
       questions = '';
     } else if(this.state.submitted === true){
-
+      user = <h2>Thanks {this.state.name}</h2>;
     }
     return (
       <div className="App">
